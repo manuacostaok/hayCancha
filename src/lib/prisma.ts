@@ -12,6 +12,9 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = basePrisma;
  * para los modelos tenant-scoped, como red de seguridad de aplicación.
  * La red de seguridad final (aunque alguien se olvide de usar esto)
  * es la Row Level Security activada en Postgres — ver docs/rls.sql.
+ * (Nota: migramos a MongoDB, que no tiene RLS nativo — ver README, sección
+ * "Pendiente para robustecer multi-tenant". Esta función es hoy la ÚNICA
+ * capa de aislamiento entre complejos, tratala como código crítico.)
  */
 const TENANT_SCOPED_MODELS = new Set([
   "Sport", "Court", "Branch", "Customer", "Booking", "Tournament", "Membership",

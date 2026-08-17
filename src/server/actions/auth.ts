@@ -44,12 +44,17 @@ export async function registerComplex(input: z.infer<typeof RegisterSchema>) {
       data: { email: data.ownerEmail, name: data.ownerEmail.split("@")[0], passwordHash },
     });
 
+    const trialEnds = new Date();
+    trialEnds.setDate(trialEnds.getDate() + 14);
+
     const complex = await tx.complex.create({
       data: {
         name: data.complexName,
         slug,
-        plan: "FREE",
+        plan: "STARTER",
+        planStatus: "TRIALING",
         memberships: { create: { userId: user.id, role: "OWNER" } },
+        subscription: { create: { plan: "STARTER", status: "TRIALING", currentPeriodEnd: trialEnds } },
       },
     });
 

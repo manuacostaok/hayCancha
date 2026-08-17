@@ -36,7 +36,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-ink px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex items-center justify-center gap-2 font-display text-lg font-bold">
-          <Trees className="h-5 w-5 text-turf-bright" /> ¿Hay Cancha?
+          <Trees className="h-5 w-5 text-turf-bright" /> Canchas
         </div>
         <div className="mb-6 flex gap-2">
           {[1, 2, 3].map((n) => <div key={n} className={`h-1 flex-1 rounded-full ${n <= step ? "bg-turf-bright" : "bg-ink-3"}`} />)}
@@ -75,7 +75,7 @@ export default function RegisterPage() {
             <h1 className="font-display text-lg font-semibold">¡Listo! Ya podés recibir reservas.</h1>
             <p className="text-sm text-chalk-dim">
               Tu link público para compartir:<br />
-              <span className="font-mono text-turf-bright">haycancha.app/book/{slug}</span>
+              <span className="font-mono text-turf-bright">canchas.app/book/{slug}</span>
             </p>
             <Button size="lg" className="w-full">Ir al calendario</Button>
           </div>

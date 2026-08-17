@@ -1,7 +1,16 @@
-# ¿Hay Cancha? — Plataforma SaaS de Gestión para Complejos Deportivos
+# Canchas — Plataforma SaaS de Gestión para Complejos Deportivos
 ### Documento de Arquitectura y Producto (Fase 0 — antes de escribir código)
 
-> Nombre de trabajo: **¿Hay Cancha?**. Cambialo cuando definas marca — lo uso solo como referencia interna en el código (schema, env vars, etc).
+> **Nota de pivot (post-lanzamiento del MVP):** se descartó el plan gratuito permanente
+> descripto en la sección 7. El modelo actual es **100% pago desde el día uno**, con un
+> trial de 14 días como gancho de venta (no un "free forever"). Precios en pesos
+> argentinos (ARS), tal como se ve en la landing y en `settings/billing`. La sección 7
+> queda como referencia histórica de la lógica Free/Pro original — la lógica de qué
+> features son "básicas" vs "premium" se mantuvo, solo cambió que ninguna es gratis para
+> siempre. El nombre del producto también cambió de "¿Hay Cancha?" a **Canchas**, para
+> no pisarse con un competidor real que ya opera con ese nombre en Colombia.
+
+> Nombre de trabajo: **Canchas**. Cambialo cuando definas marca — lo uso solo como referencia interna en el código (schema, env vars, etc).
 
 ---
 
@@ -30,7 +39,7 @@ Para este caso (miles de PyMEs, no bancos ni salud) la estrategia correcta es **
 - Cada tabla de negocio tiene `complexId` (FK a `Complex`, que es el tenant).
 - **Postgres Row Level Security (RLS)** activado en todas las tablas tenant-scoped: una policy que compara `complexId` contra `current_setting('app.current_complex_id')`, seteado por el middleware en cada request. Esto es la red de seguridad final: aunque un desarrollador se olvide un `where complexId` en una query, la base de datos igual bloquea el acceso cruzado.
 - A nivel aplicación, un **Prisma Client Extension** inyecta automáticamente `complexId` en todas las queries (findMany, create, update, delete) para que sea imposible "olvidarse" del filtro en el 99% de los casos. RLS cubre el 1% restante.
-- Subdominio por complejo: `nombredelcomplejo.haycancha.app` (Free) y dominio propio vía CNAME (Pro). El subdominio resuelve el `complexId` en middleware de Next.js antes de tocar cualquier route handler.
+- Subdominio por complejo: `nombredelcomplejo.canchas.app` (Free) y dominio propio vía CNAME (Pro). El subdominio resuelve el `complexId` en middleware de Next.js antes de tocar cualquier route handler.
 
 ### 2.2 Por qué NO database-per-tenant (al menos en el MVP)
 

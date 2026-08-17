@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * Resuelve el tenant (Complex) a partir del subdominio:
- *   canchacentral.haycancha.app  -> x-complex-slug: canchacentral
+ *   canchacentral.canchas.app  -> x-complex-slug: canchacentral
  * o de un dominio propio (plan PRO), buscado por customDomain.
  *
  * MODO DEV: en localhost no hay subdominios reales, así que resuelve
@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
  * `npm run dev` + `npm run db:seed` ya te deje entrar directo a /calendar
  * sin tocar nada más. Podés override con ?complex=otro-slug en la URL.
  */
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? "haycancha.app";
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? "canchas.app";
 const DEV_DEFAULT_SLUG = "cancha-central";
 const PUBLIC_HOSTS = new Set([ROOT_DOMAIN, `www.${ROOT_DOMAIN}`]);
 

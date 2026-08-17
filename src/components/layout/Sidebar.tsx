@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { CalendarDays, Users, LayoutGrid, Trophy, BarChart3, Settings, Trees } from "lucide-react";
+import { CalendarDays, Users, LayoutGrid, Trophy, BarChart3, Settings, Trees, Shirt, UsersRound } from "lucide-react";
 
 const NAV = [
   { href: "/calendar", label: "Calendario", icon: CalendarDays },
   { href: "/customers", label: "Clientes", icon: Users },
   { href: "/courts", label: "Canchas", icon: LayoutGrid },
+  { href: "/sports", label: "Deportes", icon: Shirt },
   { href: "/tournaments", label: "Torneos", icon: Trophy },
+  { href: "/team", label: "Equipo", icon: UsersRound },
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/settings/billing", label: "Configuración", icon: Settings },
 ];

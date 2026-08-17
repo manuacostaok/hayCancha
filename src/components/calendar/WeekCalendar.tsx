@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BookingModal } from "./BookingModal";
+import { BookingDetailSheet } from "./BookingDetailSheet";
 import { createBooking } from "@/server/actions/bookings";
 import type { BookingVM, CourtVM } from "@/types";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export function WeekCalendar({ courts, initialBookings }: { courts: CourtVM[]; i
   const [bookings, setBookings] = useState(initialBookings);
   const [modalOpen, setModalOpen] = useState(false);
   const [draft, setDraft] = useState<{ courtId: string; hour: number } | null>(null);
+  const [selected, setSelected] = useState<BookingVM | null>(null);
   const [mobileDayOffset, setMobileDayOffset] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -96,7 +98,7 @@ export function WeekCalendar({ courts, initialBookings }: { courts: CourtVM[]; i
                 return (
                   <button
                     key={`${c.id}-${hour}`}
-                    onClick={() => !b && openSlot(c.id, hour)}
+                    onClick={() => (b ? setSelected(b) : openSlot(c.id, hour))}
                     className={cn(
                       "min-h-[56px] border-b border-r border-line p-1.5 text-left transition-colors",
                       !b && "hover:bg-ink-3"
@@ -139,7 +141,7 @@ export function WeekCalendar({ courts, initialBookings }: { courts: CourtVM[]; i
                   {slotsForHour.map(({ court, booking }) => (
                     <button
                       key={court.id}
-                      onClick={() => !booking && openSlot(court.id, hour)}
+                      onClick={() => (booking ? setSelected(booking) : openSlot(court.id, hour))}
                       className={cn(
                         "flex items-center justify-between rounded-xl border border-line px-3.5 py-3 text-sm",
                         booking ? toneBg[booking.status] : "bg-ink-2 text-chalk-dim"
@@ -170,6 +172,7 @@ export function WeekCalendar({ courts, initialBookings }: { courts: CourtVM[]; i
         defaultHour={draft?.hour}
         onCreate={handleCreate}
       />
+      <BookingDetailSheet booking={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }

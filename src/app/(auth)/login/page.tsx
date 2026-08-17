@@ -22,7 +22,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-ink px-5">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex items-center justify-center gap-2 font-display text-lg font-bold">
-          <Trees className="h-5 w-5 text-turf-bright" /> ¿Hay Cancha?
+          <Trees className="h-5 w-5 text-turf-bright" /> Canchas
         </div>
         <h1 className="mb-6 text-center font-display text-xl font-semibold">Iniciar sesión</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

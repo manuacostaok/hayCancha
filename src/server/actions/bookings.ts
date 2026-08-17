@@ -23,46 +23,23 @@ export async function createBooking(input: z.infer<typeof CreateBookingSchema>) 
   const data = CreateBookingSchema.parse(input);
   const db = tenantPrisma(complex.id);
 
-  if (complex.plan === "FREE") {
-    const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0, 0, 0, 0);
-    const count = await db.booking.count({ where: { createdAt: { gte: startOfMonth } } });
-    if (count >= 200) {
-      throw new Error("Llegaste al límite de 200 reservas de tu plan Free este mes. Pasate a Pro para reservas ilimitadas.");
-    }
-  }
-
   let customer = await db.customer.findFirst({ where: { phone: data.customerPhone } });
   if (!customer) {
-  customer = await db.customer.create({
+    customer = await db.customer.create({ data: { name: data.customerName, phone: data.customerPhone } });
+  }
+
+  const court = await db.court.findFirst({ where: { id: data.courtId } });
+
+  const booking = await db.booking.create({
     data: {
-      name: data.customerName,
-      phone: data.customerPhone,
-      complexId: complex.id,
+      courtId: data.courtId,
+      customerId: customer.id,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      totalPrice: data.totalPrice,
+      status: "CONFIRMED",
     },
   });
-}
-
-const court = await db.court.findFirst({
-  where: {
-    id: data.courtId,
-    complexId: complex.id,
-  },
-});
-
-if (!court) {
-  throw new Error("Cancha no encontrada");
-}
-  const booking = await db.booking.create({
-  data: {
-    complexId: complex.id,
-    courtId: data.courtId,
-    customerId: customer.id,
-    startTime: data.startTime,
-    endTime: data.endTime,
-    totalPrice: data.totalPrice,
-    status: "CONFIRMED",
-  },
-});
 
   if (hasFeature(complex.plan, "whatsapp")) {
     await sendBookingConfirmation({
@@ -119,9 +96,23 @@ export async function getComplexUsage() {
   return {
     plan: complex.plan,
     bookingsThisMonth,
-    bookingsLimit: complex.plan === "FREE" ? 200 : null,
+    bookingsLimit: null,
     courtCount,
-    courtLimit: complex.plan === "FREE" ? 2 : null,
+    courtLimit: complex.plan === "STARTER" ? 3 : null,
     revenueThisMonth: revenueAgg._sum.totalPrice ?? 0,
   };
+}
+
+export async function cancelBooking(bookingId: string) {
+  const complex = await requireComplex();
+  const db = tenantPrisma(complex.id);
+  await db.booking.updateMany({ where: { id: bookingId }, data: { status: "CANCELED" } });
+  revalidatePath("/calendar");
+}
+
+export async function rescheduleBooking(bookingId: string, newStartTime: Date, newEndTime: Date) {
+  const complex = await requireComplex();
+  const db = tenantPrisma(complex.id);
+  await db.booking.updateMany({ where: { id: bookingId }, data: { startTime: newStartTime, endTime: newEndTime } });
+  revalidatePath("/calendar");
 }

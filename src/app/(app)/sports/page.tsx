@@ -1,11 +1,14 @@
 import { TopBar } from "@/components/layout/TopBar";
+import { SportsManager } from "@/components/sports/SportsManager";
+import { getSports } from "@/server/actions/sports";
 
-export default function SportsPage() {
+export default async function SportsPage() {
+  const sports = await getSports();
   return (
     <>
       <TopBar title="Deportes" />
-      <div className="px-4 py-4 text-sm text-chalk-dim sm:px-8">
-        ABM de deportes configurables del complejo (próximamente en este scaffold).
+      <div className="px-4 py-4 sm:px-8">
+        <SportsManager initialSports={sports} />
       </div>
     </>
   );

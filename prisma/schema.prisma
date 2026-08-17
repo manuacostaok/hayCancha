@@ -13,7 +13,7 @@ model Complex {
   name         String
   slug         String     @unique
   customDomain String?    @unique
-  plan         Plan       @default(FREE)
+  plan         Plan       @default(STARTER)
   planStatus   PlanStatus @default(ACTIVE)
   timezone     String     @default("America/Argentina/Buenos_Aires")
   logoUrl      String?
@@ -212,56 +212,11 @@ model Subscription {
   status           PlanStatus
 }
 
-
-enum Plan {
-  FREE
-  PRO
-}
-
-enum PlanStatus {
-  ACTIVE
-  PAST_DUE
-  CANCELED
-  TRIALING
-}
-
-enum Role {
-  SUPER_ADMIN
-  OWNER
-  EMPLOYEE
-}
-
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELED
-  COMPLETED
-  NO_SHOW
-}
-
-enum PaymentMethod {
-  MERCADO_PAGO
-  TRANSFER
-  CASH
-}
-
-enum TournamentFormat {
-  SINGLE_ELIM
-  DOUBLE_ELIM
-  ROUND_ROBIN
-  GROUPS_KNOCKOUT
-  LEAGUE
-}
-
-enum TournamentStatus {
-  DRAFT
-  REGISTRATION_OPEN
-  IN_PROGRESS
-  FINISHED
-}
-
-enum MatchStatus {
-  SCHEDULED
-  PLAYED
-  WALKOVER
-}
+enum Plan { STARTER PRO }
+enum PlanStatus { TRIALING ACTIVE PAST_DUE CANCELED }
+enum Role { SUPER_ADMIN OWNER EMPLOYEE }
+enum BookingStatus { PENDING CONFIRMED CANCELED COMPLETED NO_SHOW }
+enum PaymentMethod { MERCADO_PAGO TRANSFER CASH }
+enum TournamentFormat { SINGLE_ELIM DOUBLE_ELIM ROUND_ROBIN GROUPS_KNOCKOUT LEAGUE }
+enum TournamentStatus { DRAFT REGISTRATION_OPEN IN_PROGRESS FINISHED }
+enum MatchStatus { SCHEDULED PLAYED WALKOVER }

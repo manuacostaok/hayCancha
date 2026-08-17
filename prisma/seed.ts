@@ -18,7 +18,8 @@ async function main() {
     create: {
       name: "Cancha Central",
       slug: "cancha-central",
-      plan: "FREE",
+      plan: "PRO",
+      planStatus: "ACTIVE",
       memberships: { create: { userId: owner.id, role: "OWNER" } },
     },
   });

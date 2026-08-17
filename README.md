@@ -1,4 +1,4 @@
-# ¿Hay Cancha?
+# Canchas
 
 SaaS de gestión para complejos deportivos. Ver `docs/00-arquitectura-producto.md` para el diseño completo de producto y arquitectura.
 

@@ -11,7 +11,7 @@ export default async function DashboardPage() {
 
   const stats = [
     { label: "Ingresos del mes", value: formatMoney(usage.revenueThisMonth), icon: DollarSign },
-    { label: "Reservas", value: usage.bookingsLimit ? `${usage.bookingsThisMonth} / ${usage.bookingsLimit}` : `${usage.bookingsThisMonth}`, icon: CalendarCheck },
+    { label: "Reservas del mes", value: String(usage.bookingsThisMonth), icon: CalendarCheck },
     { label: "Ocupación estimada", value: `${occupancy}%`, icon: TrendingUp },
     { label: "Clientes totales", value: String(customers.length), icon: Users },
   ];
@@ -29,16 +29,19 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {usage.plan === "FREE" && usage.bookingsLimit && (
+      {usage.courtLimit && (
         <div className="px-4 pb-2 sm:px-8">
           <Card className="p-5">
             <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="text-chalk-dim">Uso del plan Free</span>
-              <span className="font-mono text-turf-bright">{usage.bookingsThisMonth}/{usage.bookingsLimit} reservas</span>
+              <span className="text-chalk-dim">Canchas — plan Starter</span>
+              <span className="font-mono text-turf-bright">{usage.courtCount}/{usage.courtLimit}</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-ink-3">
-              <div className="h-full bg-turf-bright" style={{ width: `${Math.min(100, (usage.bookingsThisMonth / usage.bookingsLimit) * 100)}%` }} />
+              <div className="h-full bg-turf-bright" style={{ width: `${Math.min(100, (usage.courtCount / usage.courtLimit) * 100)}%` }} />
             </div>
+            {usage.courtCount >= usage.courtLimit && (
+              <p className="mt-3 text-xs text-amber">Llegaste al límite de canchas de tu plan. Pasate a Pro para sumar sin tope.</p>
+            )}
           </Card>
         </div>
       )}

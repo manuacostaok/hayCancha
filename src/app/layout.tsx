@@ -7,7 +7,7 @@ const body = Inter({ subsets: ["latin"], variable: "--font-body" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "¿Hay Cancha? — Gestión para complejos deportivos",
+  title: "Canchas — Gestión para complejos deportivos",
   description: "Reservas, clientes, pagos y torneos en un solo lugar.",
 };
 
