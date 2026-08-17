@@ -26,9 +26,9 @@ export default async function BillingPage() {
             </>
           )}
 
-{usage.plan === "FREE" && (
+{usage.plan === "STARTER" && (
   <Button>Pasar a Pro — $44.900 ARS/mes</Button>
-)}        </Card>
+)}       </Card>
       </div>
     </>
   );
