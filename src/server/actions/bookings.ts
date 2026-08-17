@@ -33,11 +33,25 @@ export async function createBooking(input: z.infer<typeof CreateBookingSchema>) 
 
   let customer = await db.customer.findFirst({ where: { phone: data.customerPhone } });
   if (!customer) {
-    customer = await db.customer.create({ data: { name: data.customerName, phone: data.customerPhone } });
-  }
+  customer = await db.customer.create({
+    data: {
+      name: data.customerName,
+      phone: data.customerPhone,
+      complexId: complex.id,
+    },
+  });
+}
 
-  const court = await db.court.findFirst({ where: { id: data.courtId } });
+const court = await db.court.findFirst({
+  where: {
+    id: data.courtId,
+    complexId: complex.id,
+  },
+});
 
+if (!court) {
+  throw new Error("Cancha no encontrada");
+}
   const booking = await db.booking.create({
   data: {
     complexId: complex.id,
