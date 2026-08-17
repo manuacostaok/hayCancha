@@ -212,11 +212,56 @@ model Subscription {
   status           PlanStatus
 }
 
-enum Plan { FREE PRO }
-enum PlanStatus { ACTIVE PAST_DUE CANCELED TRIALING }
-enum Role { SUPER_ADMIN OWNER EMPLOYEE }
-enum BookingStatus { PENDING CONFIRMED CANCELED COMPLETED NO_SHOW }
-enum PaymentMethod { MERCADO_PAGO TRANSFER CASH }
-enum TournamentFormat { SINGLE_ELIM DOUBLE_ELIM ROUND_ROBIN GROUPS_KNOCKOUT LEAGUE }
-enum TournamentStatus { DRAFT REGISTRATION_OPEN IN_PROGRESS FINISHED }
-enum MatchStatus { SCHEDULED PLAYED WALKOVER }
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum PlanStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+enum Role {
+  SUPER_ADMIN
+  OWNER
+  EMPLOYEE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  COMPLETED
+  NO_SHOW
+}
+
+enum PaymentMethod {
+  MERCADO_PAGO
+  TRANSFER
+  CASH
+}
+
+enum TournamentFormat {
+  SINGLE_ELIM
+  DOUBLE_ELIM
+  ROUND_ROBIN
+  GROUPS_KNOCKOUT
+  LEAGUE
+}
+
+enum TournamentStatus {
+  DRAFT
+  REGISTRATION_OPEN
+  IN_PROGRESS
+  FINISHED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  PLAYED
+  WALKOVER
+}
