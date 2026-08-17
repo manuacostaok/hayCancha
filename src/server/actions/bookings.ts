@@ -25,21 +25,28 @@ export async function createBooking(input: z.infer<typeof CreateBookingSchema>) 
 
   let customer = await db.customer.findFirst({ where: { phone: data.customerPhone } });
   if (!customer) {
-    customer = await db.customer.create({ data: { name: data.customerName, phone: data.customerPhone } });
-  }
+  customer = await db.customer.create({
+    data: {
+      name: data.customerName,
+      phone: data.customerPhone,
+      complexId: complex.id,
+    },
+  });
+}
 
   const court = await db.court.findFirst({ where: { id: data.courtId } });
 
   const booking = await db.booking.create({
-    data: {
-      courtId: data.courtId,
-      customerId: customer.id,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      totalPrice: data.totalPrice,
-      status: "CONFIRMED",
-    },
-  });
+  data: {
+    complexId: complex.id,
+    courtId: data.courtId,
+    customerId: customer.id,
+    startTime: data.startTime,
+    endTime: data.endTime,
+    totalPrice: data.totalPrice,
+    status: "CONFIRMED",
+  },
+});
 
   if (hasFeature(complex.plan, "whatsapp")) {
     await sendBookingConfirmation({
