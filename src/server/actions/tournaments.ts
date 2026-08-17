@@ -26,8 +26,13 @@ export async function createTournament(input: z.infer<typeof CreateTournamentSch
   const db = tenantPrisma(complex.id);
 
   const tournament = await db.tournament.create({
-    data: { ...data, publicSlug: `${slugify(data.name)}-${Date.now().toString(36)}`, status: "REGISTRATION_OPEN" },
-  });
+  data: {
+    ...data,
+    complexId: complex.id,
+    publicSlug: `${slugify(data.name)}-${Date.now().toString(36)}`,
+    status: "REGISTRATION_OPEN",
+  },
+});
 
   revalidatePath("/tournaments");
   return tournament;
