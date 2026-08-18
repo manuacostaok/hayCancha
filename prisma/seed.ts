@@ -75,6 +75,10 @@ async function main() {
     ],
   });
 
+  await prisma.coupon.create({
+    data: { complexId: complex.id, code: "BIENVENIDA10", discountType: "PERCENT", discountValue: 10, isActive: true },
+  });
+
   console.log("Seed listo:", complex.slug);
 }
 

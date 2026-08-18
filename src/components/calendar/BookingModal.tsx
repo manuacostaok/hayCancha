@@ -11,7 +11,7 @@ interface Props {
   courts: CourtVM[];
   defaultCourtId?: string;
   defaultHour?: number;
-  onCreate: (data: { customerName: string; customerPhone: string; courtId: string; hour: number; durationMin: number; totalPrice: number }) => void;
+  onCreate: (data: { customerName: string; customerPhone: string; courtId: string; hour: number; durationMin: number; totalPrice: number; couponCode?: string }) => void;
 }
 
 /** Modal de alta rápida de reserva — el flujo de "1 clic" del que habla el brief. */
@@ -22,10 +22,11 @@ export function BookingModal({ open, onClose, courts, defaultCourtId, defaultHou
   const [hour, setHour] = useState(defaultHour ?? 18);
   const [duration, setDuration] = useState(60);
   const [totalPrice, setTotalPrice] = useState(12000);
+  const [couponCode, setCouponCode] = useState("");
 
   function submit() {
     if (!customerName.trim() || !customerPhone.trim()) return;
-    onCreate({ customerName, customerPhone, courtId, hour, durationMin: duration, totalPrice });
+    onCreate({ customerName, customerPhone, courtId, hour, durationMin: duration, totalPrice, couponCode: couponCode || undefined });
     setCustomerName("");
     setCustomerPhone("");
     onClose();
@@ -73,6 +74,11 @@ export function BookingModal({ open, onClose, courts, defaultCourtId, defaultHou
             <label className="mb-1.5 block text-xs font-mono uppercase tracking-wide text-chalk-dim">Precio</label>
             <Input type="number" step={500} value={totalPrice} onChange={(e) => setTotalPrice(Number(e.target.value))} />
           </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-mono uppercase tracking-wide text-chalk-dim">Cupón (opcional)</label>
+          <Input value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} placeholder="Ej: VERANO20" />
         </div>
       </div>
 

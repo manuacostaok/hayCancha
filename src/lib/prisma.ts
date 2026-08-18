@@ -17,7 +17,7 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = basePrisma;
  * capa de aislamiento entre complejos, tratala como código crítico.)
  */
 const TENANT_SCOPED_MODELS = new Set([
-  "Sport", "Court", "Branch", "Customer", "Booking", "Tournament", "Membership",
+  "Sport", "Court", "Branch", "Customer", "Booking", "Tournament", "Membership", "Coupon",
 ]);
 
 export function tenantPrisma(complexId: string) {

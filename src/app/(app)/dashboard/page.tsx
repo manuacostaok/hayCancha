@@ -1,6 +1,7 @@
 import { TopBar } from "@/components/layout/TopBar";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, DollarSign, CalendarCheck, Users } from "lucide-react";
+import { TrendingUp, DollarSign, CalendarCheck, Users, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { getComplexUsage, getCustomers } from "@/server/actions/bookings";
 import { formatMoney } from "@/lib/utils";
 
@@ -19,6 +20,13 @@ export default async function DashboardPage() {
   return (
     <>
       <TopBar title="Dashboard" />
+      {usage.plan === "PRO" && (
+        <div className="flex justify-end px-4 pt-4 sm:px-8">
+          <a href="/api/reports/bookings">
+            <Button size="sm" variant="ghost"><Download className="h-4 w-4" /> Exportar reservas del mes (CSV)</Button>
+          </a>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3 px-4 py-4 sm:px-8 lg:grid-cols-4 lg:gap-4">
         {stats.map(({ label, value, icon: Icon }) => (
           <Card key={label} className="p-4 sm:p-5">

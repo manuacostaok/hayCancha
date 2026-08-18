@@ -5,6 +5,7 @@ import { requireComplex } from "@/lib/tenant";
 import { tenantPrisma } from "@/lib/prisma";
 import { hasFeature } from "@/lib/permissions";
 import { sendBookingConfirmation } from "@/lib/notifications/whatsapp";
+import { validateCoupon } from "./coupons";
 import { formatTime } from "@/lib/utils";
 
 const CreateBookingSchema = z.object({
@@ -14,6 +15,7 @@ const CreateBookingSchema = z.object({
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   totalPrice: z.number().nonnegative(),
+  couponCode: z.string().optional(),
 });
 
 /** Alta de reserva: valida el límite del plan Free, crea/reutiliza cliente,
@@ -25,28 +27,46 @@ export async function createBooking(input: z.infer<typeof CreateBookingSchema>) 
 
   let customer = await db.customer.findFirst({ where: { phone: data.customerPhone } });
   if (!customer) {
-  customer = await db.customer.create({
-    data: {
-      name: data.customerName,
-      phone: data.customerPhone,
-      complexId: complex.id,
-    },
-  });
-}
+    customer = await db.customer.create({ data: { name: data.customerName, phone: data.customerPhone } });
+  }
 
   const court = await db.court.findFirst({ where: { id: data.courtId } });
 
+  // Cupón (Pro): si viene un código, se valida y se aplica el descuento acá,
+  // nunca confiando en un totalPrice ya descontado que venga del cliente.
+  let finalPrice = data.totalPrice;
+  let discountApplied = 0;
+  let appliedCode: string | undefined;
+  if (data.couponCode && hasFeature(complex.plan, "coupons")) {
+    const result = await validateCoupon(data.couponCode, data.totalPrice);
+    if (result.valid) {
+      finalPrice = result.finalPrice;
+      discountApplied = result.discount;
+      appliedCode = data.couponCode.toUpperCase();
+      await db.coupon.updateMany({ where: { id: result.couponId }, data: { usesCount: { increment: 1 } } });
+    }
+  }
+
   const booking = await db.booking.create({
-  data: {
-    complexId: complex.id,
-    courtId: data.courtId,
-    customerId: customer.id,
-    startTime: data.startTime,
-    endTime: data.endTime,
-    totalPrice: data.totalPrice,
-    status: "CONFIRMED",
-  },
-});
+    data: {
+      courtId: data.courtId,
+      customerId: customer.id,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      totalPrice: finalPrice,
+      discountApplied,
+      couponCode: appliedCode,
+      status: "CONFIRMED",
+    },
+  });
+
+  // Fidelización (Pro): 1 punto cada $1.000 gastados. Simple y transparente.
+  if (hasFeature(complex.plan, "loyalty")) {
+    await db.customer.updateMany({
+      where: { id: customer.id },
+      data: { loyaltyPoints: { increment: Math.floor(finalPrice / 1000) } },
+    });
+  }
 
   if (hasFeature(complex.plan, "whatsapp")) {
     await sendBookingConfirmation({
@@ -122,4 +142,11 @@ export async function rescheduleBooking(bookingId: string, newStartTime: Date, n
   const db = tenantPrisma(complex.id);
   await db.booking.updateMany({ where: { id: bookingId }, data: { startTime: newStartTime, endTime: newEndTime } });
   revalidatePath("/calendar");
+}
+
+export async function toggleVip(customerId: string, isVip: boolean) {
+  const complex = await requireComplex();
+  const db = tenantPrisma(complex.id);
+  await db.customer.updateMany({ where: { id: customerId }, data: { isVip } });
+  revalidatePath("/customers");
 }

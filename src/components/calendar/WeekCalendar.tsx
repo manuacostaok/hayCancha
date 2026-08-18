@@ -38,7 +38,7 @@ export function WeekCalendar({ courts, initialBookings }: { courts: CourtVM[]; i
     setModalOpen(true);
   }
 
-  function handleCreate(data: { customerName: string; courtId: string; hour: number; durationMin: number; customerPhone: string; totalPrice: number }) {
+  function handleCreate(data: { customerName: string; courtId: string; hour: number; durationMin: number; customerPhone: string; totalPrice: number; couponCode?: string }) {
     const court = courts.find((c) => c.id === data.courtId)!;
 
     // optimista: se ve al toque en el calendario mientras el server confirma
@@ -60,6 +60,7 @@ export function WeekCalendar({ courts, initialBookings }: { courts: CourtVM[]; i
           startTime: start,
           endTime: end,
           totalPrice: data.totalPrice,
+          couponCode: data.couponCode,
         });
         router.refresh();
       } catch (e: any) {

@@ -1,6 +1,10 @@
 import { Trophy, Trees } from "lucide-react";
 import { Bracket } from "@/components/tournaments/Bracket";
+import { StandingsTable } from "@/components/tournaments/StandingsTable";
 import { getTournamentBySlug } from "@/server/actions/tournaments-read";
+import { getStandings } from "@/server/actions/tournaments";
+
+const IS_LEAGUE = new Set(["ROUND_ROBIN", "LEAGUE"]);
 
 export default async function PublicTournamentPage({ params }: { params: { tournamentSlug: string } }) {
   const tournament = await getTournamentBySlug(params.tournamentSlug);
@@ -8,6 +12,9 @@ export default async function PublicTournamentPage({ params }: { params: { tourn
   if (!tournament) {
     return <div className="flex min-h-screen items-center justify-center bg-ink text-chalk-dim">Torneo no encontrado.</div>;
   }
+
+  const isLeague = IS_LEAGUE.has(tournament.format);
+  const standings = isLeague && tournament.matches.length > 0 ? await getStandings(tournament.id) : [];
 
   return (
     <div className="min-h-screen bg-ink px-5 py-8 text-chalk sm:px-8">
@@ -21,7 +28,10 @@ export default async function PublicTournamentPage({ params }: { params: { tourn
           </div>
         </div>
         {tournament.matches.length > 0 ? (
-          <Bracket matches={tournament.matches as any} />
+          <div className="flex flex-col gap-6">
+            {isLeague && <StandingsTable standings={standings} />}
+            <Bracket matches={tournament.matches as any} />
+          </div>
         ) : (
           <p className="text-sm text-chalk-dim">El fixture todavía no se generó.</p>
         )}

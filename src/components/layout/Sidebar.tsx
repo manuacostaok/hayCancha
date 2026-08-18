@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Users, LayoutGrid, Trophy, BarChart3, Settings, Trees, Shirt, UsersRound } from "lucide-react";
+import { CalendarDays, Users, LayoutGrid, Trophy, BarChart3, Settings, Trees, Shirt, UsersRound, Megaphone } from "lucide-react";
 
 const NAV = [
   { href: "/calendar", label: "Calendario", icon: CalendarDays },
@@ -7,6 +7,7 @@ const NAV = [
   { href: "/courts", label: "Canchas", icon: LayoutGrid },
   { href: "/sports", label: "Deportes", icon: Shirt },
   { href: "/tournaments", label: "Torneos", icon: Trophy },
+  { href: "/marketing", label: "Marketing", icon: Megaphone },
   { href: "/team", label: "Equipo", icon: UsersRound },
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { href: "/settings/billing", label: "Configuración", icon: Settings },

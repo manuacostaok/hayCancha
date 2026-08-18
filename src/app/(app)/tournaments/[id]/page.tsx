@@ -1,13 +1,19 @@
 import { TopBar } from "@/components/layout/TopBar";
 import { Bracket } from "@/components/tournaments/Bracket";
+import { StandingsTable } from "@/components/tournaments/StandingsTable";
 import { TeamRegistrationForm } from "@/components/tournaments/TeamRegistrationForm";
 import { Button } from "@/components/ui/button";
 import { getTournament } from "@/server/actions/tournaments-read";
-import { generateFixture } from "@/server/actions/tournaments";
+import { generateFixture, getStandings } from "@/server/actions/tournaments";
+
+const IS_LEAGUE = new Set(["ROUND_ROBIN", "LEAGUE"]);
 
 export default async function TournamentDetailPage({ params }: { params: { id: string } }) {
   const tournament = await getTournament(params.id);
   if (!tournament) return <p className="p-8 text-sm text-chalk-dim">Torneo no encontrado.</p>;
+
+  const isLeague = IS_LEAGUE.has(tournament.format);
+  const standings = isLeague && tournament.matches.length > 0 ? await getStandings(params.id) : [];
 
   async function handleGenerate() {
     "use server";
@@ -20,7 +26,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       <div className="flex flex-col gap-6 px-4 py-4 sm:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-chalk-dim">
-            {tournament.teams.length} equipos anotados · link público: <span className="font-mono text-turf-bright">/t/{tournament.publicSlug}</span>
+            {tournament.format.replace("_", " ")} · {tournament.teams.length} equipos anotados · link público: <span className="font-mono text-turf-bright">/t/{tournament.publicSlug}</span>
           </p>
           {tournament.matches.length === 0 && (
             <form action={handleGenerate}>
@@ -32,7 +38,10 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         {tournament.matches.length === 0 && <TeamRegistrationForm tournamentId={tournament.id} />}
 
         {tournament.matches.length > 0 ? (
-          <Bracket matches={tournament.matches as any} />
+          <>
+            {isLeague && <StandingsTable standings={standings} />}
+            <Bracket matches={tournament.matches as any} />
+          </>
         ) : (
           <p className="text-sm text-chalk-dim">Anotá al menos 2 equipos y generá el fixture.</p>
         )}
