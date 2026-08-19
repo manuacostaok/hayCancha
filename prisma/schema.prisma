@@ -8,6 +8,7 @@ datasource db {
 }
 
 // ============ TENANT ============
+
 model Complex {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
@@ -42,39 +43,45 @@ model Branch {
 }
 
 // ============ DEPORTES CONFIGURABLES ============
+
 model Sport {
-  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
-  complexId          String       @db.ObjectId
-  complex            Complex      @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  complexId          String  @db.ObjectId
+  complex            Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
   name               String
   icon               String?
-  defaultSlotMinutes Int          @default(60)
+  defaultSlotMinutes Int     @default(60)
   minPlayers         Int?
   maxPlayers         Int?
-  allowsTournaments  Boolean      @default(true)
-  courts             Court[]
-  tournaments        Tournament[]
+  allowsTournaments  Boolean @default(true)
+
+  courts      Court[]
+  tournaments Tournament[]
 }
 
 model Court {
-  id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  complexId String        @db.ObjectId
-  complex   Complex       @relation(fields: [complexId], references: [id], onDelete: Cascade)
-  branchId  String?       @db.ObjectId
-  branch    Branch?       @relation(fields: [branchId], references: [id])
-  sportId   String        @db.ObjectId
-  sport     Sport         @relation(fields: [sportId], references: [id])
-  name      String
-  isActive  Boolean       @default(true)
-  pricing   PricingRule[]
-  bookings  Booking[]
-  matches   Match[]
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  complexId String  @db.ObjectId
+  complex   Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
+
+  branchId String? @db.ObjectId
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
+  sportId String @db.ObjectId
+  sport   Sport  @relation(fields: [sportId], references: [id])
+
+  name     String
+  isActive Boolean @default(true)
+
+  pricing  PricingRule[]
+  bookings Booking[]
+  matches  Match[]
 }
 
 model PricingRule {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  courtId      String  @db.ObjectId
-  court        Court   @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  courtId      String @db.ObjectId
+  court        Court  @relation(fields: [courtId], references: [id], onDelete: Cascade)
   dayOfWeek    Int?
   startTime    String
   endTime      String
@@ -82,14 +89,17 @@ model PricingRule {
 }
 
 // ============ USUARIOS Y PERMISOS ============
+
 model User {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  email        String       @unique
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  email        String  @unique
   name         String
   phone        String?
   passwordHash String?
-  memberships  Membership[]
-  createdAt    DateTime     @default(now())
+
+  memberships Membership[]
+
+  createdAt DateTime @default(now())
 }
 
 model Membership {
@@ -106,47 +116,51 @@ model Membership {
 }
 
 model Customer {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  complexId     String    @db.ObjectId
-  complex       Complex   @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  complexId     String  @db.ObjectId
+  complex       Complex @relation(fields: [complexId], references: [id], onDelete: Cascade)
   name          String
   phone         String
   email         String?
-  isVip         Boolean   @default(false)
-  loyaltyPoints Int       @default(0)
-  bookings      Booking[]
-  createdAt     DateTime  @default(now())
+  isVip         Boolean @default(false)
+  loyaltyPoints Int     @default(0)
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
 }
 
 // ============ RESERVAS ============
+
 model Booking {
-  id            String         @id @default(auto()) @map("_id") @db.ObjectId
-  complexId     String         @db.ObjectId
-  complex       Complex        @relation(fields: [complexId], references: [id], onDelete: Cascade)
-  courtId       String         @db.ObjectId
-  court         Court          @relation(fields: [courtId], references: [id])
-  customerId    String?        @db.ObjectId
-  customer      Customer?      @relation(fields: [customerId], references: [id])
-  createdById   String?        @db.ObjectId
-  createdBy     Membership?    @relation(fields: [createdById], references: [id])
-  startTime     DateTime
-  endTime       DateTime
-  status        BookingStatus  @default(PENDING)
-  totalPrice    Float
-  depositPaid   Float          @default(0)
-  paymentMethod PaymentMethod?
-  mpPreferenceId String?
-  mpPaymentId    String?
-  couponCode    String?
-  discountApplied Float        @default(0)
-  notes         String?
-  isRecurring   Boolean        @default(false)
-  createdAt     DateTime       @default(now())
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  complexId       String         @db.ObjectId
+  complex         Complex        @relation(fields: [complexId], references: [id], onDelete: Cascade)
+  courtId         String         @db.ObjectId
+  court           Court          @relation(fields: [courtId], references: [id])
+  customerId      String?        @db.ObjectId
+  customer        Customer?      @relation(fields: [customerId], references: [id])
+  createdById     String?        @db.ObjectId
+  createdBy       Membership?    @relation(fields: [createdById], references: [id])
+  startTime       DateTime
+  endTime         DateTime
+  status          BookingStatus  @default(PENDING)
+  totalPrice      Float
+  depositPaid     Float          @default(0)
+  paymentMethod   PaymentMethod?
+  mpPreferenceId  String?
+  mpPaymentId     String?
+  couponCode      String?
+  discountApplied Float          @default(0)
+  notes           String?
+  isRecurring     Boolean        @default(false)
+  createdAt       DateTime       @default(now())
 
   @@index([complexId, courtId, startTime])
 }
 
 // ============ TORNEOS (PRO) ============
+
 model Tournament {
   id              String           @id @default(auto()) @map("_id") @db.ObjectId
   complexId       String           @db.ObjectId
@@ -159,10 +173,12 @@ model Tournament {
   registrationFee Float?
   publicSlug      String           @unique
   coverImageUrl   String?
-  teams           TournamentTeam[]
-  matches         Match[]
-  sponsors        Sponsor[]
-  createdAt       DateTime         @default(now())
+
+  teams    TournamentTeam[]
+  matches  Match[]
+  sponsors Sponsor[]
+
+  createdAt DateTime @default(now())
 }
 
 model TournamentTeam {
@@ -173,27 +189,35 @@ model TournamentTeam {
   players          Json
   paidRegistration Boolean    @default(false)
   seed             Int?
-  matchesAsA       Match[]    @relation("teamA")
-  matchesAsB       Match[]    @relation("teamB")
+
+  matchesAsA Match[] @relation("teamA")
+  matchesAsB Match[] @relation("teamB")
 }
 
 model Match {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
-  tournamentId String          @db.ObjectId
-  tournament   Tournament      @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  tournamentId String     @db.ObjectId
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   round        String
-  roundOrder   Int             @default(0)
-  courtId      String?         @db.ObjectId
-  court        Court?          @relation(fields: [courtId], references: [id])
-  scheduledAt  DateTime?
-  teamAId      String?         @db.ObjectId
-  teamA        TournamentTeam? @relation("teamA", fields: [teamAId], references: [id])
-  teamBId      String?         @db.ObjectId
-  teamB        TournamentTeam? @relation("teamB", fields: [teamBId], references: [id])
-  scoreA       Int?
-  scoreB       Int?
-  status       MatchStatus     @default(SCHEDULED)
-  nextMatchId  String?         @db.ObjectId
+  roundOrder   Int        @default(0)
+
+  courtId String? @db.ObjectId
+  court   Court?  @relation(fields: [courtId], references: [id])
+
+  scheduledAt DateTime?
+
+  teamAId String?         @db.ObjectId
+  teamA   TournamentTeam? @relation("teamA", fields: [teamAId], references: [id])
+
+  teamBId String?         @db.ObjectId
+  teamB   TournamentTeam? @relation("teamB", fields: [teamBId], references: [id])
+
+  scoreA Int?
+  scoreB Int?
+
+  status MatchStatus @default(SCHEDULED)
+
+  nextMatchId String? @db.ObjectId
 }
 
 model Sponsor {
@@ -204,8 +228,8 @@ model Sponsor {
   logoUrl      String?
 }
 
-// ============ FACTURACIÓN SAAS ============
 // ============ MARKETING (PRO) ============
+
 model Coupon {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
   complexId     String       @db.ObjectId
@@ -221,6 +245,8 @@ model Coupon {
   @@unique([complexId, code])
 }
 
+// ============ FACTURACIÓN SAAS ============
+
 model Subscription {
   id               String     @id @default(auto()) @map("_id") @db.ObjectId
   complexId        String     @unique @db.ObjectId
@@ -231,12 +257,62 @@ model Subscription {
   status           PlanStatus
 }
 
-enum Plan { STARTER PRO }
-enum DiscountType { PERCENT FIXED }
-enum PlanStatus { TRIALING ACTIVE PAST_DUE CANCELED }
-enum Role { SUPER_ADMIN OWNER EMPLOYEE }
-enum BookingStatus { PENDING CONFIRMED CANCELED COMPLETED NO_SHOW }
-enum PaymentMethod { MERCADO_PAGO TRANSFER CASH }
-enum TournamentFormat { SINGLE_ELIM DOUBLE_ELIM ROUND_ROBIN GROUPS_KNOCKOUT LEAGUE }
-enum TournamentStatus { DRAFT REGISTRATION_OPEN IN_PROGRESS FINISHED }
-enum MatchStatus { SCHEDULED PLAYED WALKOVER }
+// ============ ENUMS ============
+
+enum Plan {
+  STARTER
+  PRO
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+}
+
+enum PlanStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum Role {
+  SUPER_ADMIN
+  OWNER
+  EMPLOYEE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  COMPLETED
+  NO_SHOW
+}
+
+enum PaymentMethod {
+  MERCADO_PAGO
+  TRANSFER
+  CASH
+}
+
+enum TournamentFormat {
+  SINGLE_ELIM
+  DOUBLE_ELIM
+  ROUND_ROBIN
+  GROUPS_KNOCKOUT
+  LEAGUE
+}
+
+enum TournamentStatus {
+  DRAFT
+  REGISTRATION_OPEN
+  IN_PROGRESS
+  FINISHED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  PLAYED
+  WALKOVER
+}
