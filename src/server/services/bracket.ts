@@ -131,3 +131,16 @@ export function computeStandings(matches: MatchResult[]): StandingsRow[] {
 
   return Array.from(table.values()).sort((x, y) => y.points - x.points || y.diff - x.diff || y.goalsFor - x.goalsFor);
 }
+
+/** Reparte equipos en grupos de ~4 para la fase de grupos. */
+export function splitIntoGroups(teams: SeedTeam[], groupSize = 4): SeedTeam[][] {
+  const sorted = [...teams].sort((a, b) => a.seed - b.seed);
+  const numGroups = Math.max(1, Math.ceil(sorted.length / groupSize));
+  const groups: SeedTeam[][] = Array.from({ length: numGroups }, () => []);
+  sorted.forEach((t, i) => groups[i % numGroups].push(t));
+  return groups;
+}
+
+export function groupLabel(i: number) {
+  return String.fromCharCode(65 + i); // 0->A, 1->B, ...
+}

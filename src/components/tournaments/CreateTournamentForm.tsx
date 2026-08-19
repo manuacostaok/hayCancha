@@ -11,8 +11,10 @@ interface SportVM { id: string; name: string }
 
 const FORMATS: { value: string; label: string }[] = [
   { value: "SINGLE_ELIM", label: "Eliminación simple" },
+  { value: "DOUBLE_ELIM", label: "Doble eliminación" },
   { value: "ROUND_ROBIN", label: "Todos contra todos" },
   { value: "LEAGUE", label: "Liga (fechas)" },
+  { value: "GROUPS_KNOCKOUT", label: "Fase de grupos + playoffs" },
 ];
 
 export function CreateTournamentForm({ sports }: { sports: SportVM[] }) {

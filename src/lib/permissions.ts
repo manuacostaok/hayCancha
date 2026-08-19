@@ -1,4 +1,8 @@
-import type { Role, Plan } from "@prisma/client";
+// Tipos definidos acá en vez de importarlos de "@prisma/client": son uniones
+// de string simples que reflejan 1:1 los enums del schema (Plan, Role), y así
+// este archivo no depende de que el cliente de Prisma ya esté generado.
+export type Plan = "STARTER" | "PRO";
+export type Role = "SUPER_ADMIN" | "OWNER" | "EMPLOYEE";
 
 /** Features exclusivas de cada plan. Un solo lugar para cambiar el gating. */
 const PRO_FEATURES = new Set([
@@ -36,7 +40,6 @@ export function can(membership: MembershipLike | null, action: Action, _resource
   if (!membership) return false;
   if (membership.role === "SUPER_ADMIN" || membership.role === "OWNER") return true;
 
-  // EMPLOYEE: por defecto puede operar, salvo overrides finos (PRO) guardados en `permissions`
   const restricted: Action[] = ["manage_billing", "manage_employees"];
   if (restricted.includes(action)) return false;
 

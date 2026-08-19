@@ -39,7 +39,7 @@ export async function registerComplex(input: z.infer<typeof RegisterSchema>) {
 
   const passwordHash = await bcrypt.hash(data.ownerPassword, 10);
 
-  const complex = await basePrisma.$transaction(async (tx) => {
+  const complex = await basePrisma.$transaction(async (tx: any) => {
     const user = await tx.user.create({
       data: { email: data.ownerEmail, name: data.ownerEmail.split("@")[0], passwordHash },
     });
@@ -70,4 +70,30 @@ export async function registerComplex(input: z.infer<typeof RegisterSchema>) {
   });
 
   return { slug: complex.slug };
+}
+
+const RegisterPlayerSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+/** Cuenta de jugador: solo login, sin complejo ni membership — no gestiona nada, solo reserva. */
+export async function registerPlayer(input: z.infer<typeof RegisterPlayerSchema>) {
+  const data = RegisterPlayerSchema.parse(input);
+
+  const existing = await basePrisma.user.findUnique({ where: { email: data.email } });
+  if (existing) throw new Error("Ya existe una cuenta con ese email.");
+
+  const passwordHash = await bcrypt.hash(data.password, 10);
+  const user = await basePrisma.user.create({
+    data: { name: data.name, email: data.email, passwordHash },
+  });
+
+  return { userId: user.id };
+}
+
+export async function hasAnyMembership(email: string) {
+  const user = await basePrisma.user.findUnique({ where: { email }, include: { memberships: true } });
+  return (user?.memberships.length ?? 0) > 0;
 }

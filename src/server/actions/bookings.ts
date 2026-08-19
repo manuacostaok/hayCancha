@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { requireComplex } from "@/lib/tenant";
 import { tenantPrisma } from "@/lib/prisma";
 import { hasFeature } from "@/lib/permissions";
-import { sendBookingConfirmation } from "@/lib/notifications/whatsapp";
+import { sendBookingConfirmation, sendCancellationNotice, sendRescheduleNotice } from "@/lib/notifications/whatsapp";
+import { sendBookingEmail } from "@/lib/notifications/email";
 import { validateCoupon } from "./coupons";
 import { formatTime } from "@/lib/utils";
 
@@ -74,7 +75,17 @@ export async function createBooking(input: z.infer<typeof CreateBookingSchema>) 
       customerName: customer.name,
       courtName: court?.name ?? "tu cancha",
       when: formatTime(data.startTime),
-    }).catch((e) => console.error("WhatsApp falló, no bloqueamos la reserva:", e));
+    }).catch((e: any) => console.error("WhatsApp falló, no bloqueamos la reserva:", e));
+  }
+  if (customer.email) {
+    await sendBookingEmail({
+      to: customer.email,
+      customerName: customer.name,
+      courtName: court?.name ?? "tu cancha",
+      complexName: complex.name,
+      when: formatTime(data.startTime),
+      kind: "confirmacion",
+    }).catch((e: any) => console.error("Email falló, no bloqueamos la reserva:", e));
   }
 
   revalidatePath("/calendar");
@@ -133,14 +144,46 @@ export async function getComplexUsage() {
 export async function cancelBooking(bookingId: string) {
   const complex = await requireComplex();
   const db = tenantPrisma(complex.id);
+  const booking = await db.booking.findFirst({ where: { id: bookingId }, include: { court: true, customer: true } });
+  if (!booking) throw new Error("Reserva no encontrada");
+
   await db.booking.updateMany({ where: { id: bookingId }, data: { status: "CANCELED" } });
+
+  if (booking.customer) {
+    const when = formatTime(booking.startTime);
+    if (hasFeature(complex.plan, "whatsapp")) {
+      await sendCancellationNotice({ toPhone: booking.customer.phone, customerName: booking.customer.name, courtName: booking.court.name, when })
+        .catch((e: any) => console.error("WhatsApp de cancelación falló:", e));
+    }
+    if (booking.customer.email) {
+      await sendBookingEmail({ to: booking.customer.email, customerName: booking.customer.name, courtName: booking.court.name, complexName: complex.name, when, kind: "cancelacion" })
+        .catch((e: any) => console.error("Email de cancelación falló:", e));
+    }
+  }
+
   revalidatePath("/calendar");
 }
 
 export async function rescheduleBooking(bookingId: string, newStartTime: Date, newEndTime: Date) {
   const complex = await requireComplex();
   const db = tenantPrisma(complex.id);
+  const booking = await db.booking.findFirst({ where: { id: bookingId }, include: { court: true, customer: true } });
+  if (!booking) throw new Error("Reserva no encontrada");
+
   await db.booking.updateMany({ where: { id: bookingId }, data: { startTime: newStartTime, endTime: newEndTime } });
+
+  if (booking.customer) {
+    const when = formatTime(newStartTime);
+    if (hasFeature(complex.plan, "whatsapp")) {
+      await sendRescheduleNotice({ toPhone: booking.customer.phone, customerName: booking.customer.name, courtName: booking.court.name, when })
+        .catch((e: any) => console.error("WhatsApp de reprogramación falló:", e));
+    }
+    if (booking.customer.email) {
+      await sendBookingEmail({ to: booking.customer.email, customerName: booking.customer.name, courtName: booking.court.name, complexName: complex.name, when, kind: "reprogramacion" })
+        .catch((e: any) => console.error("Email de reprogramación falló:", e));
+    }
+  }
+
   revalidatePath("/calendar");
 }
 

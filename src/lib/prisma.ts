@@ -24,7 +24,7 @@ export function tenantPrisma(complexId: string) {
   return basePrisma.$extends({
     query: {
       $allModels: {
-        async $allOperations({ model, operation, args, query }) {
+        async $allOperations({ model, operation, args, query }: any) {
           if (!model || !TENANT_SCOPED_MODELS.has(model)) return query(args);
 
           const a = args as any;

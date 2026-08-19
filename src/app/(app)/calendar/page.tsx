@@ -6,8 +6,8 @@ import type { BookingVM, CourtVM } from "@/types";
 export default async function CalendarPage() {
   const [courts, bookings] = await Promise.all([getCourtsWithSport(), getBookingsForDay(new Date())]);
 
-  const courtVMs: CourtVM[] = courts.map((c) => ({ id: c.id, name: c.name, sportName: c.sport.name }));
-  const bookingVMs: BookingVM[] = bookings.map((b) => ({
+  const courtVMs: CourtVM[] = courts.map((c: any) => ({ id: c.id, name: c.name, sportName: c.sport.name }));
+  const bookingVMs: BookingVM[] = bookings.map((b: any) => ({
     id: b.id,
     courtId: b.courtId,
     courtName: b.court.name,

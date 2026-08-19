@@ -9,7 +9,7 @@ export default async function CourtsPage() {
     <>
       <TopBar title="Canchas" />
       <div className="grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-3">
-        {courts.map((c) => (
+        {courts.map((c: any) => (
           <Card key={c.id} className="p-5">
             <div className="mb-1 font-display font-semibold">{c.name}</div>
             <div className="mb-3 font-mono text-xs text-chalk-dim">{c.sport.name}</div>

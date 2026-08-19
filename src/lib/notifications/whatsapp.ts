@@ -49,3 +49,44 @@ export async function sendBookingConfirmation({ toPhone, customerName, courtName
   }
   return { sent: true };
 }
+
+async function sendTemplate(templateName: string, toPhone: string, params: string[]) {
+  const token = process.env.WHATSAPP_TOKEN;
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+
+  if (!token || !phoneNumberId) {
+    console.log(`[whatsapp:stub] ${templateName} a ${toPhone}: ${params.join(", ")}`);
+    return { sent: false, reason: "WhatsApp no configurado (falta WHATSAPP_TOKEN)" };
+  }
+
+  const res = await fetch(`https://graph.facebook.com/v20.0/${phoneNumberId}/messages`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to: toPhone.replace(/\D/g, ""),
+      type: "template",
+      template: {
+        name: templateName,
+        language: { code: "es_AR" },
+        components: [{ type: "body", parameters: params.map((text) => ({ type: "text", text })) }],
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    console.error(`Error enviando WhatsApp (${templateName}):`, await res.text());
+    return { sent: false, reason: "Falló el envío" };
+  }
+  return { sent: true };
+}
+
+/** Requiere una plantilla "cancelacion_reserva" aprobada en Meta con las mismas 3 variables. */
+export async function sendCancellationNotice({ toPhone, customerName, courtName, when }: SendConfirmationInput) {
+  return sendTemplate("cancelacion_reserva", toPhone, [customerName, courtName, when]);
+}
+
+/** Requiere una plantilla "reprogramacion_reserva" aprobada en Meta con las mismas 3 variables. */
+export async function sendRescheduleNotice({ toPhone, customerName, courtName, when }: SendConfirmationInput) {
+  return sendTemplate("reprogramacion_reserva", toPhone, [customerName, courtName, when]);
+}

@@ -20,7 +20,7 @@ export async function GET() {
   });
 
   const header = "Fecha,Hora,Cancha,Cliente,Telefono,Precio,Descuento,Cupon,Estado\n";
-  const rows = bookings.map((b) => [
+  const rows = bookings.map((b: any) => [
     new Date(b.startTime).toLocaleDateString("es-AR"),
     new Date(b.startTime).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }),
     b.court.name,
